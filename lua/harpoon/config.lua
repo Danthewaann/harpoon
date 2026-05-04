@@ -110,25 +110,32 @@ function M.get_default_config()
                 local set_position = false
                 if bufnr == -1 then -- must create a buffer!
                     set_position = true
-                    -- bufnr = vim.fn.bufnr(list_item.value, true)
-                    bufnr = vim.fn.bufadd(list_item.value)
+                    if options.vsplit then
+                        vim.cmd.vsplit(list_item.value)
+                    elseif options.split then
+                        vim.cmd.split(list_item.value)
+                    elseif options.tabedit then
+                        vim.cmd.tabedit(list_item.value)
+                    else
+                        vim.cmd.edit(list_item.value)
+                    end
+                    bufnr = vim.api.nvim_get_current_buf()
+                else
+                    if not vim.api.nvim_buf_is_loaded(bufnr) then
+                        vim.fn.bufload(bufnr)
+                        vim.api.nvim_set_option_value("buflisted", true, {
+                            buf = bufnr,
+                        })
+                    end
+                    if options.vsplit then
+                        vim.cmd.vsplit()
+                    elseif options.split then
+                        vim.cmd.split()
+                    elseif options.tabedit then
+                        vim.cmd.tabedit()
+                    end
+                    vim.api.nvim_set_current_buf(bufnr)
                 end
-                if not vim.api.nvim_buf_is_loaded(bufnr) then
-                    vim.fn.bufload(bufnr)
-                    vim.api.nvim_set_option_value("buflisted", true, {
-                        buf = bufnr,
-                    })
-                end
-
-                if options.vsplit then
-                    vim.cmd("vsplit")
-                elseif options.split then
-                    vim.cmd("split")
-                elseif options.tabedit then
-                    vim.cmd("tabedit")
-                end
-
-                vim.api.nvim_set_current_buf(bufnr)
 
                 if set_position then
                     local lines = vim.api.nvim_buf_line_count(bufnr)
