@@ -85,7 +85,7 @@ function HarpoonList:new(config, name, items)
         config = config,
         name = name,
         _length = guess_length(items),
-        _index = 1,
+        _index = 0,
     }, self)
 end
 
